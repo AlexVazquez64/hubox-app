@@ -26,6 +26,7 @@ services:
     build:
       context: ./backend
       dockerfile: Dockerfile
+      target: production
     container_name: hubox_api
     restart: unless-stopped
     environment:
@@ -46,9 +47,6 @@ services:
     depends_on:
       mysql:
         condition: service_healthy
-    volumes:
-      - ./backend:/app
-      - /app/node_modules
     networks:
       - hubox_network
 
@@ -62,12 +60,9 @@ services:
       VITE_API_URL: ${VITE_API_URL}
       VITE_GOOGLE_CLIENT_ID: ${GOOGLE_CLIENT_ID}
     ports:
-      - '3000:3000'
+      - '3000:80'
     depends_on:
       - backend
-    volumes:
-      - ./frontend:/app
-      - /app/node_modules
     networks:
       - hubox_network
 

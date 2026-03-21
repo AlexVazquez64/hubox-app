@@ -6,8 +6,18 @@ RUN npm ci --omit=dev
 FROM base AS development
 RUN npm ci
 COPY . .
-CMD ["npm", "run", "dev"]
+CMD ["npx", "tsx", "src/server.ts"]
 
-FROM base AS production
+FROM node:20-alpine AS build
+WORKDIR /app
+COPY package*.json ./
+RUN npm ci
 COPY . .
-CMD ["npm", "start"]
+RUN npx tsc
+
+FROM node:20-alpine AS production
+WORKDIR /app
+COPY package*.json ./
+RUN npm ci --omit=dev
+COPY --from=build /app/dist ./dist
+CMD ["node", "dist/server.js"]
