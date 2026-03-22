@@ -20,6 +20,7 @@ export interface ContactFormData {
   phone?: string;
   company?: string;
   message: string;
+  recaptchaToken?: string;
 }
 
 export interface ContactListParams {

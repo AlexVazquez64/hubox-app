@@ -8,10 +8,19 @@ import {
 import { authenticate, requireAdmin } from '../middleware/auth.js';
 import { validateContact } from '../middleware/validators.js';
 import { contactFormLimiter } from '../middleware/rateLimiter.js';
+import { validateEmailDomain } from '../middleware/emailValidator.js';
+import { validateRecaptcha } from '../middleware/recaptcha.js';
 
 const router = Router();
 
-router.post('/', contactFormLimiter, validateContact, submitContact as any);
+router.post(
+  '/',
+  contactFormLimiter,
+  validateRecaptcha,
+  validateEmailDomain,
+  validateContact,
+  submitContact as any
+);
 
 router.use(authenticate as any);
 router.get('/', listContacts as any);
