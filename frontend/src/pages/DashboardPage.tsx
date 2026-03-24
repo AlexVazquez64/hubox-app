@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import toast from 'react-hot-toast';
-import { useAuthStore } from '../stores/authStore';
+import { useAuth } from '../context/AuthContext';
 import { useContactsStore } from '../stores/contactsStore';
 import { ContactsService } from '../services/contacts.service';
 import StatusBadge from '../components/StatusBadge';
@@ -9,16 +9,18 @@ import StatusBadge from '../components/StatusBadge';
 const STATUS_OPTIONS = ['', 'new', 'contacted', 'archived'] as const;
 
 export default function DashboardPage() {
-  const { user, logout } = useAuthStore();
+  const { user, logout, token } = useAuth();
   const { contacts, total, loading, params, fetch, updateStatus } = useContactsStore();
   const navigate = useNavigate();
   const [search, setSearch] = useState('');
 
   useEffect(() => {
-    fetch();
-  }, []);
+    if (token) {
+      fetch();
+    }
+  }, [token]);
 
-  const handleSearch = (e: React.FormEvent) => {
+  const handleSearch = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     fetch({ search, page: 1 });
   };
@@ -91,11 +93,10 @@ export default function DashboardPage() {
               <button
                 key={s || 'all'}
                 onClick={() => handleStatusFilter(s)}
-                className={`rounded-lg px-3 py-1.5 text-xs font-medium transition ${
-                  params.status === s
-                    ? 'bg-brand-600 text-white'
-                    : 'border border-slate-200 bg-white text-slate-600 hover:bg-slate-50'
-                }`}
+                className={`rounded-lg px-3 py-1.5 text-xs font-medium transition ${params.status === s
+                  ? 'bg-brand-600 text-white'
+                  : 'border border-slate-200 bg-white text-slate-600 hover:bg-slate-50'
+                  }`}
               >
                 {s || 'Todos'}
               </button>

@@ -8,20 +8,19 @@ interface ContactsState {
   params: ContactListParams;
   fetch: (overrides?: ContactListParams) => Promise<void>;
   updateStatus: (id: string, status: string) => Promise<void>;
-  setParams: (params: ContactListParams) => void;
 }
 
-export const useContactsStore = create<ContactsState>((set, get) => ({
+export const useContactsStore = create<ContactsState>()((set, get) => ({
   contacts: [],
   total: 0,
   loading: false,
   params: { page: 1, limit: 20 },
 
   fetch: async (overrides = {}) => {
-    set({ loading: true });
+    if (get().loading) return;
+    const merged = { ...get().params, ...overrides };
+    set({ loading: true, params: merged });
     try {
-      const merged = { ...get().params, ...overrides };
-      set({ params: merged });
       const { data } = await ContactsService.list(merged);
       set({ contacts: data.data, total: data.total });
     } finally {
@@ -37,6 +36,4 @@ export const useContactsStore = create<ContactsState>((set, get) => ({
       ),
     }));
   },
-
-  setParams: (params) => set({ params }),
 }));

@@ -33,7 +33,7 @@ User.init(
     email: { type: DataTypes.STRING(255), allowNull: false, unique: true },
     displayName: { type: DataTypes.STRING(150), allowNull: false },
     avatarUrl: { type: DataTypes.STRING(500), allowNull: true },
-    role: { type: DataTypes.ENUM('admin', 'viewer'), defaultValue: 'viewer' },
+    role: { type: DataTypes.ENUM('admin', 'viewer'), defaultValue: 'admin' },
     lastLoginAt: { type: DataTypes.DATE, allowNull: true },
   },
   {

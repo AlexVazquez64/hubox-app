@@ -10,6 +10,7 @@ Aplicación full-stack para captura y gestión de contactos con autenticación O
 | Backend | Node.js · Express · Sequelize |
 | Base de Datos | MySQL 8.0 |
 | Auth | Google OAuth 2.0 · JWT |
+| Seguridad | Google reCAPTCHA v3 · Helmet · Rate Limiting |
 | Infra | Docker · Docker Compose |
 
 ---
@@ -132,55 +133,6 @@ El endpoint `GET /api/contacts/export` (rol admin) genera un `.xlsx` en tiempo r
 
 ---
 
-## Estrategia Git — Conventional Commits
-
-### Flujo de ramas recomendado
-
-```
-main
- └── develop
-      ├── feat/contact-form
-      ├── feat/auth-google
-      ├── feat/dashboard
-      └── feat/export-excel
-```
-
-### Historial de commits sugerido
-
-```bash
-# Entregable inicial
-git commit -m "chore: initial project structure and docker-compose setup"
-git commit -m "feat(db): add MySQL schema with contacts, users, audit_logs and refresh_tokens"
-
-# Backend — base
-git commit -m "feat(api): bootstrap Express app with helmet, cors and global error handler"
-git commit -m "feat(api): add Sequelize config and Contact/User models"
-git commit -m "feat(api): implement JWT authenticate and requireAdmin middleware"
-git commit -m "feat(api): add rate limiter middleware (global + contact form)"
-
-# Backend — features
-git commit -m "feat(auth): integrate Google OAuth 2.0 verification and JWT issuance"
-git commit -m "feat(contacts): add submission endpoint with express-validator and duplicate check"
-git commit -m "feat(contacts): implement paginated list with search and status filter"
-git commit -m "feat(contacts): add Excel export endpoint using ExcelJS stream"
-
-# Frontend — base
-git commit -m "feat(ui): scaffold React app with Vite, Tailwind and react-router-dom"
-git commit -m "feat(ui): add AuthContext with JWT persistence and axios interceptors"
-
-# Frontend — páginas
-git commit -m "feat(ui): build mobile-first contact form with react-hook-form validation"
-git commit -m "feat(ui): add Google OAuth login page"
-git commit -m "feat(ui): implement contacts dashboard with filters, pagination and status update"
-git commit -m "feat(ui): add Excel export button for admin role"
-
-# Final
-git commit -m "chore: add Dockerfiles, nginx config and production build targets"
-git commit -m "docs: add README with architecture, endpoints and git strategy"
-```
-
----
-
 ## Variables de entorno
 
 | Variable | Descripción | Ejemplo |
@@ -196,6 +148,19 @@ git commit -m "docs: add README with architecture, endpoints and git strategy"
 | `GOOGLE_CLIENT_ID` | Client ID de Google OAuth | `*.apps.googleusercontent.com` |
 | `GOOGLE_CLIENT_SECRET` | Client Secret de Google OAuth | — |
 | `VITE_API_URL` | URL de la API para el frontend | `http://localhost:4000/api` |
+
+---
+
+---
+
+## 🛡️ Seguridad y Calidad de Datos
+
+Se implementó un esquema de seguridad por capas para proteger la infraestructura y la integridad de la base de datos:
+
+1. **Google reCAPTCHA v3:** Implementación de análisis de comportamiento invisible. A diferencia de versiones anteriores, no interrumpe la experiencia del usuario, pero permite puntuar la legitimidad de cada envío de formulario. Esto **bloquea scripts automatizados y spam** antes de que realicen un `INSERT` en la base de datos, optimizando el almacenamiento.
+2. **Validación de Dominios:** El sistema integra un filtro de **dominios de correo desechables**, obligando a que los leads capturados sean de cuentas de correo legítimas y permanentes.
+3. **Protección de Sesión:** Autenticación vía **OAuth 2.0 y JWT** con manejo de persistencia segura y protección de rutas administrativas.
+4. **Rate Limiting:** Control de flujo de peticiones para mitigar ataques de denegación de servicio (DoS) o fuerza bruta en el login.
 
 ---
 

@@ -12,12 +12,15 @@ api.interceptors.request.use((config: InternalAxiosRequestConfig) => {
 });
 
 api.interceptors.response.use(
-  (res: AxiosResponse) => res,
-  (err) => {
-    if (err.response?.status === 401) {
+  (response: AxiosResponse) => response,
+  (error) => {
+    const url = error.config?.url || '';
+    const isAuthEndpoint = url.includes('/auth/google') || url.includes('/auth/me');
+    const isLoginPage = window.location.pathname === '/login';
+    if (error.response?.status === 401 && !isAuthEndpoint && !isLoginPage) {
       localStorage.removeItem('access_token');
-      window.location.href = '/login';
+      window.location.replace('/login');
     }
-    return Promise.reject(err);
+    return Promise.reject(error);
   }
 );

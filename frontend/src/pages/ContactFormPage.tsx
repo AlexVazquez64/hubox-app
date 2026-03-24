@@ -30,6 +30,8 @@ export default function ContactFormPage() {
 
     try {
       const recaptchaToken = await executeRecaptcha('contact_form');
+      console.log('reCAPTCHA token:', recaptchaToken);
+      console.log('token length:', recaptchaToken?.length);
       await ContactsService.submit({ ...data, recaptchaToken });
       setSubmitted(true);
       toast.success('¡Mensaje enviado con éxito!');

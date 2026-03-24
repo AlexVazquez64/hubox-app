@@ -41,13 +41,13 @@ CREATE TABLE IF NOT EXISTS contacts (
   source        ENUM('web','api','import') NOT NULL DEFAULT 'web',
   status        ENUM('new','contacted','archived') NOT NULL DEFAULT 'new',
   ip_address    VARCHAR(45)               DEFAULT NULL,
-  submitted_at  DATETIME        NOT NULL  DEFAULT CURRENT_TIMESTAMP,
+  created_at    DATETIME        NOT NULL  DEFAULT CURRENT_TIMESTAMP,
   updated_at    DATETIME        NOT NULL  DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
 
   CONSTRAINT pk_contacts        PRIMARY KEY (id),
   INDEX         idx_contacts_email  (email),
   INDEX         idx_contacts_status (status),
-  INDEX         idx_contacts_date   (submitted_at)
+  INDEX         idx_contacts_date   (created_at)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- ─────────────────────────────────────────────────────
